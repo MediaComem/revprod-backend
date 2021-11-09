@@ -1,0 +1,42 @@
+extends ../page-layout
+
+block content
+  //- Validation errors
+  if errors
+    .alert.alert-warning.mb-3
+      strong Please fix the following issues:
+      ul.mb-0
+        each error in errors
+          li
+            = error.message
+
+  //- Registration form
+  form.col-12.col-md-10.col-lg-8.col-xl-6(action='/users', method='POST')
+    //- Username field
+    .mb-3
+      label.form-label(for='user-name') Username
+      input#user-name.form-control(
+        type='text',
+        name='name',
+        autocomplete='username',
+        required,
+        minlength=2,
+        maxlength=20
+      )
+
+    //- Password field
+    .mb-3
+      label.form-label(for='user-password') Password
+      input#user-password.form-control(
+        type='password',
+        name='password',
+        autocomplete='current-password',
+        required,
+        minlength=8,
+        maxlength=1000
+      )
+
+    //- Actions
+    .btn-group
+      button.btn.btn-primary(type='submit') Register
+      a.btn.btn-secondary(href='/') Cancel

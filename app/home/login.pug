@@ -1,0 +1,32 @@
+//- Login form
+form.col-12.col-md-10.col-lg-8.col-xl-6(action='/login', method='POST')
+
+  //- Username field
+  .mb-3
+    label.form-label(for='login-username') Username
+    input#login-username.form-control(
+      type='text',
+      name='username',
+      value= username
+      autocomplete='username',
+      autofocus= !username,
+      required,
+      minlength=1
+    )
+
+  //- Password field
+  .mb-3
+    label.form-label(for='login-password') Password
+    input#login-password.form-control(
+      type='password',
+      name='password',
+      autocomplete='current-password',
+      autofocus= !!username,
+      required,
+      minlength=1
+    )
+
+  //- Actions
+  .btn-group
+    button.btn.btn-primary(type='submit') Log in
+    a.btn.btn-secondary(href='/users/new') Register

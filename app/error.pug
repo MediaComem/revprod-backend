@@ -1,0 +1,11 @@
+extends layout
+
+block page
+  .container
+    h1.mt-5.text-danger= message
+    h2.mt-3
+      | Code
+      = ' '
+      = status
+    pre.mt-3 #{ stack }
+    a.btn.btn-primary(href="/") Back to safety

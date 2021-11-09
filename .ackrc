@@ -1,0 +1,4 @@
+# https://beyondgrep.com
+--ignore-file=is:db.loki
+--ignore-dir=node_modules
+--ignore-file=is:package-lock.json

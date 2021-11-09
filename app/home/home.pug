@@ -1,0 +1,7 @@
+extends ../page-layout
+
+block content
+  if user
+    include dashboard.pug
+  else
+    include login.pug

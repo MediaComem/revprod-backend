@@ -1,0 +1,52 @@
+{
+  "name": "@alphahydrae/exploit-corsican-charity-backend",
+  "version": "1.0.0",
+  "description": "An online charity demonstrating what can happen when you allow too much CORS",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/AlphaHydrae/exploit-corsican-charity.git"
+  },
+  "author": "Simon Oulevay <contact@alphahydrae.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AlphaHydrae/exploit-corsican-charity/issues"
+  },
+  "homepage": "https://github.com/AlphaHydrae/exploit-corsican-charity#readme",
+  "type": "module",
+  "scripts": {
+    "clean": "del db.loki \"sessions/*.json\"",
+    "dev": "nodemon",
+    "lint": "prettier --check .",
+    "lint:write": "prettier --write .",
+    "start": "node ./bin.js"
+  },
+  "dependencies": {
+    "ajv": "^8.6.3",
+    "ajv-errors": "^3.0.0",
+    "bcrypt": "^5.0.1",
+    "connect-flash": "^0.1.1",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "fast-glob": "^3.2.7",
+    "http-errors": "^1.8.0",
+    "lodash-es": "^4.17.21",
+    "log4js": "^6.3.0",
+    "lokijs": "^1.5.12",
+    "luxon": "^2.1.0",
+    "pug": "^3.0.2",
+    "session-file-store": "^1.5.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@prettier/plugin-pug": "^1.16.7",
+    "chalk": "^4.1.2",
+    "del-cli": "^4.0.1",
+    "dotenv": "^10.0.0",
+    "nodemon": "^2.0.14",
+    "prettier": "^2.4.1"
+  },
+  "engines": {
+    "node": ">= 16.0.0"
+  }
+}

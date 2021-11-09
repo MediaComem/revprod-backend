@@ -1,0 +1,40 @@
+extends layout
+
+block page
+
+  //- Navbar
+  nav.navbar.navbar-expand-lg.navbar-dark.bg-danger
+    .container-fluid
+      a.navbar-brand(href="/")= title
+
+      //- Logout
+      if user
+        form(action="/logout", method="POST")
+          button.btn.btn-navbar(type="submit")
+            i.bi.bi-box-arrow-right
+            = ' '
+            | Log out
+
+  //- Welcome message
+  .container
+    p.lead.mt-3
+      | Welcome to the #{ title }!
+
+    if pageTitle
+      h2.mb-3= pageTitle
+
+    //- Flash messages
+    if flash
+      if flash.warning
+        each warning in flash.warning
+          .alert.alert-warning
+            i.bi.bi-exclamation-triangle-fill.me-2
+            = flash.warning
+      if flash.info
+        each info in flash.info
+          .alert.alert-success.d-flex.align-items-center
+            i.bi.bi-check-circle-fill.me-2
+            = flash.info
+
+    //- Page content
+    block content

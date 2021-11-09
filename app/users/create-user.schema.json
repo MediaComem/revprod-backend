@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 20,
+      "errorMessage": {
+        "minLength": "Username must not have fewer than 2 characters",
+        "maxLength": "Username must not have more than 20 characters"
+      }
+    },
+    "password": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 1000,
+      "errorMessage": {
+        "minLength": "Password must not have fewer than 8 characters",
+        "maxLength": "Password must not have more than 1000 characters"
+      }
+    }
+  },
+  "required": ["name", "password"],
+  "additionalProperties": false
+}
