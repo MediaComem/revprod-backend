@@ -1,3 +1,4 @@
 {
-  "ignore": [".git", "node_modules", "sessions"]
+  "ignore": [".git", "node_modules", "sessions"],
+  "watch": ["app", ".env", "*.js"]
 }

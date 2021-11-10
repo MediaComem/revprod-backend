@@ -1,21 +1,21 @@
 {
-  "name": "@alphahydrae/exploit-corsican-charity-backend",
+  "name": "comem-archidep-revprod-backend",
   "version": "1.0.0",
-  "description": "An online charity demonstrating what can happen when you allow too much CORS",
+  "description": "Backend of the website for The Revolutionary Product",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/AlphaHydrae/exploit-corsican-charity.git"
+    "url": "git+ssh://git@github.com/MediaComem/revprod-backend.git"
   },
   "author": "Simon Oulevay <contact@alphahydrae.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/AlphaHydrae/exploit-corsican-charity/issues"
+    "url": "https://github.com/MediaComem/revprod-backend/issues"
   },
-  "homepage": "https://github.com/AlphaHydrae/exploit-corsican-charity#readme",
+  "homepage": "https://github.com/MediaComem/revprod-backend#readme",
   "type": "module",
   "scripts": {
-    "clean": "del db.loki \"sessions/*.json\"",
+    "clean": "del db.json",
     "dev": "nodemon",
     "lint": "prettier --check .",
     "lint:write": "prettier --write .",
@@ -24,20 +24,15 @@
   "dependencies": {
     "ajv": "^8.6.3",
     "ajv-errors": "^3.0.0",
-    "bcrypt": "^5.0.1",
     "chalk": "^4.1.2",
-    "connect-flash": "^0.1.1",
-    "csurf": "^1.11.0",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
-    "express-session": "^1.17.2",
     "fast-glob": "^3.2.7",
     "http-errors": "^1.8.0",
     "lodash-es": "^4.17.21",
     "log4js": "^6.3.0",
-    "lokijs": "^1.5.12",
     "luxon": "^2.1.0",
     "pug": "^3.0.2",
-    "session-file-store": "^1.5.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

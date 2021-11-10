@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50,
+      "errorMessage": {
+        "minLength": "Name must have at least 1 character",
+        "maxLength": "Name must not have more than 50 characters"
+      }
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 5000,
+      "errorMessage": {
+        "minLength": "Text must have at least 1 character",
+        "maxLength": "Text must not have more than 5,000 characters"
+      }
+    }
+  },
+  "required": ["name", "text"],
+  "additionalProperties": false
+}

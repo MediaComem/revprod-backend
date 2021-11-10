@@ -1,5 +1,5 @@
 import { route } from '../express.js';
 
 export const homePage = route((req, res) => {
-  res.redirect('/donate');
+  res.redirect('/share');
 });

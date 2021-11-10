@@ -1,0 +1,31 @@
+extends ../page-layout
+
+block content
+  .row.mt-4
+    //- Share form
+    .col-12.col-lg-6
+      h3 Share your experience!
+
+      form.mt-3(action='/share', method='POST')
+
+        //- Name field
+        .mb-3
+          label.form-label(for='share-name') Name
+          input#share-name.form-control(
+            type='string',
+            name='name',
+            required,
+            minlength=1,
+            maxlength=50
+          )
+
+        //- Comment field
+        .mb-3
+          label.form-label(for='share-comment') Comment
+          textarea#share-comment.form-control(
+            name='comment',
+            rows=3
+          )
+
+        //- Actions
+        button.btn.btn-primary(type='submit') Share

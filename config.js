@@ -1,9 +1,10 @@
-import { isInteger } from 'lodash-es';
+import { identity, isInteger } from 'lodash-es';
 import log4js from 'log4js';
 import { dirname, resolve as resolvePath } from 'path';
 import { fileURLToPath } from 'url';
 
-export const logLevels = ['FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'];
+const logLevels = ['FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'];
+
 export const root = dirname(fileURLToPath(import.meta.url));
 
 export async function loadConfig() {
@@ -13,35 +14,27 @@ export async function loadConfig() {
 
   const dbFile = resolvePath(
     root,
-    parseEnvString('CHARITY_DB_FILE', 'db.loki')
-  );
-  const sessionsDir = resolvePath(
-    root,
-    parseEnvString('CHARITY_SESSIONS_DIR', 'sessions')
+    parseEnvString('REVPROD_DB_FILE', 'db.loki')
   );
 
-  const host = parseEnvString('CHARITY_LISTEN_HOST', '0.0.0.0');
-  const port = parseEnvPort('CHARITY_LISTEN_PORT', 3000);
+  const host = parseEnvString('REVPROD_LISTEN_HOST', '0.0.0.0');
+  const port = parseEnvPort('REVPROD_LISTEN_PORT', 3000);
 
   const logLevel = parseEnvEnum(
-    'CHARITY_LOG_LEVEL',
+    'REVPROD_LOG_LEVEL',
     logLevels,
     env === 'production' ? 'DEBUG' : 'TRACE',
     value => value.toUpperCase()
   );
 
-  const bcryptRounds = parseEnvInt('CHARITY_BCRYPT_ROUNDS', 10, 1);
-  const sessionLifetime = parseEnvInt(
-    'CHARITY_SESSION_LIFETIME',
-    // 1 day in milliseconds
-    1000 * 60 * 60 * 24,
-    1
+  const cors = parseEnvBoolean('REVPROD_CORS', false);
+  const corsOrigins = parseEnvString('REVPROD_CORS_ORIGINS', [], origins =>
+    origins.split(',')
   );
-  const sessionSecret = parseEnvString('CHARITY_SESSION_SECRET');
 
-  const title = parseEnvString('CHARITY_TITLE', 'The Corsican Charity');
+  const title = parseEnvString('REVPROD_TITLE', 'The Revolutionary Product');
   const landingPageBaseUrl = parseEnvString(
-    'CHARITY_LANDING_PAGE_BASE_URL',
+    'REVPROD_LANDING_PAGE_BASE_URL',
     ''
   );
 
@@ -54,20 +47,24 @@ export async function loadConfig() {
   const logger = createLogger('config');
   logger.info(`Environment: ${env}`);
   logger.info(`Log level: ${logLevel}`);
+  logger.info(`CORS enabled: ${cors}`);
+  logger.info(
+    `CORS allowed origins: ${
+      corsOrigins.length ? corsOrigins.join(', ') : 'all'
+    }`
+  );
 
   return {
     // Paths
     dbFile,
-    sessionsDir,
     // Environment,
     env,
     // Server
     host,
     port,
     // Security
-    bcryptRounds,
-    sessionLifetime,
-    sessionSecret,
+    cors,
+    corsOrigins,
     // Application
     title,
     landingPageBaseUrl,
@@ -98,7 +95,22 @@ function getEnvString(varName, required = true) {
   return value;
 }
 
-function parseEnvEnum(varName, allowedValues, defaultValue, coerce) {
+function parseEnvBoolean(varName, defaultValue) {
+  const value = getEnvString(varName, defaultValue === undefined);
+  if (value === undefined) {
+    return defaultValue;
+  } else if (value.match(/^(?:1|y|yes|t|true)$/u)) {
+    return true;
+  } else if (value.match(/^(?:0|n|no|f|false)$/u)) {
+    return false;
+  } else {
+    throw new Error(
+      `$${varName} must be a boolean, but its value is ${JSON.stringify(value)}`
+    );
+  }
+}
+
+function parseEnvEnum(varName, allowedValues, defaultValue, coerce = identity) {
   const value = getEnvString(varName, defaultValue === undefined);
   if (value === undefined) {
     return defaultValue;
@@ -142,7 +154,11 @@ function parseEnvPort(varName, defaultValue) {
   return parseEnvInt(varName, defaultValue, 1, 65_535);
 }
 
-function parseEnvString(varName, defaultValue) {
+function parseEnvString(varName, defaultValue, coerce = identity) {
   const value = getEnvString(varName, defaultValue === undefined);
-  return value ?? defaultValue;
+  if (value === undefined) {
+    return defaultValue;
+  }
+
+  return coerce(value);
 }

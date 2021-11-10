@@ -1,39 +1,52 @@
-import Loki from 'lokijs';
+import { readFile, writeFile } from 'fs/promises';
+import { omit } from 'lodash-es';
+import { DateTime } from 'luxon';
 
-export function openDatabase(config) {
-  return new Promise((resolve, reject) => {
-    const db = new Loki(config.dbFile, {
-      autoload: true,
-      autoloadCallback: initializeDatabase,
-      autosave: true,
-      autosaveInterval: 0
-    });
-
-    const logger = config.createLogger('db');
-
-    function initializeDatabase(err) {
-      if (err) {
-        return reject(err);
-      }
-
-      ensureCollection(db, 'users', logger, { unique: ['name'] });
-      ensureCollection(db, 'donations', logger);
-
-      logger.info(`Opened database file ${config.dbFile}`);
-      resolve(db);
+export async function openDatabase(config) {
+  try {
+    const dbContents = await readFile(config.dbFile, 'utf8');
+    const { comments } = JSON.parse(dbContents);
+    return {
+      comments: comments.map(deserializeComment),
+      config
+    };
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      return createBlankDatabase();
     }
-  });
-}
 
-export function closeDatabase(db) {
-  return new Promise((resolve, reject) =>
-    db.close(err => (err ? reject(err) : resolve()))
-  );
-}
-
-function ensureCollection(db, name, logger, options = {}) {
-  if (!db.getCollection(name)) {
-    db.addCollection(name, options);
-    logger.debug(`Created database collection ${name}`);
+    throw err;
   }
+}
+
+export async function createComment(db, { name, text }) {
+  const comment = { name, text, date: DateTime.now() };
+  db.comments.push(serializeComment(comment));
+  await saveDatabase(db);
+  return comment;
+}
+
+function createBlankDatabase(config) {
+  return {
+    config,
+    comments: []
+  };
+}
+
+function deserializeComment({ date, ...rest }) {
+  return {
+    ...rest,
+    date: DateTime.fromISO(date)
+  };
+}
+
+function serializeComment({ date, ...rest }) {
+  return {
+    ...rest,
+    date: date.toISO()
+  };
+}
+
+async function saveDatabase(db) {
+  await writeFile(db.config.dbFile, JSON.stringify(omit(db, 'config')), 'utf8');
 }

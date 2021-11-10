@@ -1,50 +1,29 @@
 import chalk from 'chalk';
-import connectFlash from 'connect-flash';
-import csurf from 'csurf';
+import cors from 'cors';
 import express from 'express';
 import createError from 'http-errors';
 import log4js from 'log4js';
 import { join as joinPath } from 'path';
-import session from 'express-session';
-import sessionFileStoreFactory from 'session-file-store';
 
 import { root } from './config.js';
-import { getRequestId, requestLogger } from './app/express.js';
 import router from './app/routes.js';
-
-const csrfProtection = csurf();
-const SessionFileStore = sessionFileStoreFactory(session);
 
 export function createApplication(config, db) {
   const app = express();
-  const logger = config.createLogger('express');
+  const logger = config.createLogger('app');
 
   app.set('config', config);
   app.set('db', db);
   app.set('env', config.env);
+  app.set('logger', logger);
   app.set('port', config.port);
 
   // Use https://pugjs.org for templates.
   app.set('views', joinPath(root, 'app'));
   app.set('view engine', 'pug');
 
-  const reqLogger = config.createLogger('req');
-
-  // Generate a request ID and create a logger for each request.
-  app.use(requestLogger());
-
   // Log requests.
-  app.use(
-    log4js.connectLogger(reqLogger, {
-      level: 'DEBUG',
-      format: (req, res, format) =>
-        format(
-          `${chalk.gray(
-            `[${getRequestId(req)}]`
-          )} - :remote-addr - ":method :url HTTP/:http-version" :status :content-length ":referrer" ":user-agent"`
-        )
-    })
-  );
+  app.use(log4js.connectLogger(logger, { level: 'DEBUG' }));
 
   // Parse form data.
   app.use(express.urlencoded({ extended: false }));
@@ -52,52 +31,19 @@ export function createApplication(config, db) {
   // Serve static files from the public directory.
   app.use(express.static(joinPath(root, 'public')));
 
-  // Manage sessions with https://github.com/expressjs/session#readme.
-  const secureCookies = config.env === 'production';
-  logger.info(`Secure cookies: ${secureCookies ? 'enabled' : 'disabled'}`);
+  // Provide common local variables to all views.
+  app.use(provideDefaultLocals(config));
 
-  const encryptedSessionStorage = config.env === 'production';
-  logger.info(
-    `Session storage encryption: ${
-      encryptedSessionStorage ? 'enabled' : 'disabled'
-    }`
-  );
-
-  app.use(
-    session({
-      cookie: {
-        maxAge: config.sessionLifetime,
-        secure: secureCookies
-      },
-      resave: true,
-      saveUninitialized: true,
-      secret: config.sessionSecret,
-      // Store sessions in files with
-      // https://github.com/valery-barysok/session-file-store#readme.
-      store: new SessionFileStore({
-        path: config.sessionsDir,
-        logFn: (...args) => logger.debug(...args),
-        secret: encryptedSessionStorage ? config.sessionSecret : undefined
+  // Allow cross origin requests (if enabled).
+  if (config.cors) {
+    app.use(
+      cors({
+        origin: config.corsOrigins.length
+          ? config.corsOrigins.length
+          : undefined
       })
-    })
-  );
-
-  // Protect against Cross-Site Request Forgery (CSRF).
-  app.use(csrfProtection);
-  app.use((req, res, next) => {
-    res.locals.csrfToken = req.csrfToken();
-    next();
-  });
-
-  // Save flash messages in session.
-  app.use(connectFlash());
-
-  // Set the title for all pages, including the error page.
-  app.use((req, res, next) => {
-    res.locals.title = config.title;
-    res.locals.landingPageBaseUrl = config.landingPageBaseUrl;
-    next();
-  });
+    );
+  }
 
   // Plug in application routes.
   app.use('/', router);
@@ -109,7 +55,7 @@ export function createApplication(config, db) {
 
   // Global error handler
   app.use((err, req, res, next) => {
-    req.logger.warn(err);
+    logger.warn(err);
 
     // Set locals, only providing error in development.
     res.locals.message = err.message ?? 'An unexpected error occurred';
@@ -122,4 +68,12 @@ export function createApplication(config, db) {
   });
 
   return app;
+}
+
+function provideDefaultLocals(config) {
+  return (req, res, next) => {
+    res.locals.title = config.title;
+    res.locals.landingPageBaseUrl = config.landingPageBaseUrl;
+    next();
+  };
 }

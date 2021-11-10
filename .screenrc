@@ -4,5 +4,3 @@ screen -t server 0
 stuff "npm run dev\012"
 screen -t sh 1
 stuff "npm run lint\012"
-
-select sh
