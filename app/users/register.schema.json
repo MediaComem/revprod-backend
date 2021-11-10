@@ -18,8 +18,17 @@
         "minLength": "Password must not have fewer than 8 characters",
         "maxLength": "Password must not have more than 1000 characters"
       }
+    },
+    "creditCard": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "errorMessage": {
+        "minLength": "Credit card must have at least 1 character",
+        "maxLength": "Credit card must not have more than 100 characters"
+      }
     }
   },
-  "required": ["name", "password"],
+  "required": ["name", "password", "creditCard"],
   "additionalProperties": false
 }

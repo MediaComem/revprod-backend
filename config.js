@@ -39,7 +39,11 @@ export async function loadConfig() {
   );
   const sessionSecret = parseEnvString('CHARITY_SESSION_SECRET');
 
-  const title = parseEnvString('CHARITY_TITLE', 'The Coriscan Charity');
+  const title = parseEnvString('CHARITY_TITLE', 'The Corsican Charity');
+  const landingPageBaseUrl = parseEnvString(
+    'CHARITY_LANDING_PAGE_BASE_URL',
+    ''
+  );
 
   function createLogger(category) {
     const logger = log4js.getLogger(category);
@@ -64,8 +68,9 @@ export async function loadConfig() {
     bcryptRounds,
     sessionLifetime,
     sessionSecret,
-    // Other
+    // Application
     title,
+    landingPageBaseUrl,
     // Functions
     createLogger
   };

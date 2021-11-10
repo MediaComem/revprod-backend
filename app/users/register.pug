@@ -11,7 +11,10 @@ block content
             = error.message
 
   //- Registration form
-  form.col-12.col-md-10.col-lg-8.col-xl-6(action='/users', method='POST')
+  form.col-12.col-md-10.col-lg-8.col-xl-6(action='/users/register', method='POST')
+    //- Anti-CSRF token
+    input(type="hidden", name="_csrf", value=csrfToken)
+
     //- Username field
     .mb-3
       label.form-label(for='user-name') Username
@@ -36,7 +39,18 @@ block content
         maxlength=1000
       )
 
+    //- Credit card number
+    .mb-3
+      label.form-label(for='user-credit-card') Credit card
+      input#user-credit-card.form-control(
+        type='text',
+        name='creditCard',
+        required,
+        minlength=1,
+        maxlength=100
+      )
+
     //- Actions
     .btn-group
       button.btn.btn-primary(type='submit') Register
-      a.btn.btn-secondary(href='/') Cancel
+      a.btn.btn-secondary(href='/users/login') Cancel

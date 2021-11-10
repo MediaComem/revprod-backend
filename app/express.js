@@ -26,10 +26,9 @@ export function route(func) {
       });
     }
 
-    const enrichedRes = {
-      redirect: redirectAfterSavingSession,
-      render: renderWithDefaultLocals
-    };
+    const enrichedRes = Object.create(res);
+    res.redirect = redirectAfterSavingSession;
+    res.render = renderWithDefaultLocals;
 
     return Promise.resolve()
       .then(() => func(req, enrichedRes, next))

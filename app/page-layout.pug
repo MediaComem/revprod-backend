@@ -1,25 +1,22 @@
 extends layout
 
 block page
-
   //- Navbar
-  nav.navbar.navbar-expand-lg.navbar-dark.bg-danger
-    .container-fluid
-      a.navbar-brand(href="/")= title
+  nav.navbar.navbar-expand-lg.navbar-dark.bg-danger.mb-5
+    .container.px-5
+      a.navbar-brand(href=landingPageBaseUrl + '/')
+        i.bi.bi-piggy-bank.me-2
+        = ' '
+        = title
 
-      //- Logout
-      if user
-        form(action="/logout", method="POST")
-          button.btn.btn-navbar(type="submit")
-            i.bi.bi-box-arrow-right
-            = ' '
-            | Log out
+      ul.navbar-nav.ms-auto.mb-2.mb-lg-0
+        li.nav-item
+          a.nav-link(href="/") Home
+        li.nav-item
+          a.nav-link.active(href="/donate") Donate
 
   //- Welcome message
   .container
-    p.lead.mt-3
-      | Welcome to the #{ title }!
-
     if pageTitle
       h2.mb-3= pageTitle
 
@@ -27,12 +24,12 @@ block page
     if flash
       if flash.warning
         each warning in flash.warning
-          .alert.alert-warning
+          .alert.alert-warning.mt-3
             i.bi.bi-exclamation-triangle-fill.me-2
             = flash.warning
       if flash.info
         each info in flash.info
-          .alert.alert-success.d-flex.align-items-center
+          .alert.alert-success.d-flex.align-items-center.mt-3
             i.bi.bi-check-circle-fill.me-2
             = flash.info
 

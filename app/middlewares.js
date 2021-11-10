@@ -3,7 +3,7 @@ export function authenticate() {
     const { user } = req.session;
     if (!user) {
       req.flash('warning', 'Authentication is required');
-      return res.redirect('/');
+      return res.redirect('/users/login');
     }
 
     req.logger.trace(

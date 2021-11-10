@@ -7,7 +7,7 @@ import usersRouter from './users/users.routes.js';
 const router = express.Router();
 
 router.use('/', homeRouter);
-router.use('/donations', donationsRouter);
+router.use('/donate', donationsRouter);
 router.use('/users', usersRouter);
 
 export default router;

@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import connectFlash from 'connect-flash';
+import csurf from 'csurf';
 import express from 'express';
 import createError from 'http-errors';
 import log4js from 'log4js';
@@ -11,6 +12,7 @@ import { root } from './config.js';
 import { getRequestId, requestLogger } from './app/express.js';
 import router from './app/routes.js';
 
+const csrfProtection = csurf();
 const SessionFileStore = sessionFileStoreFactory(session);
 
 export function createApplication(config, db) {
@@ -80,12 +82,20 @@ export function createApplication(config, db) {
     })
   );
 
+  // Protect against Cross-Site Request Forgery (CSRF).
+  app.use(csrfProtection);
+  app.use((req, res, next) => {
+    res.locals.csrfToken = req.csrfToken();
+    next();
+  });
+
   // Save flash messages in session.
   app.use(connectFlash());
 
   // Set the title for all pages, including the error page.
   app.use((req, res, next) => {
     res.locals.title = config.title;
+    res.locals.landingPageBaseUrl = config.landingPageBaseUrl;
     next();
   });
 
