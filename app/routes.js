@@ -6,8 +6,8 @@ import usersRouter from './users/users.routes.js';
 
 const router = express.Router();
 
-router.use('/', homeRouter);
-router.use('/donate', donationsRouter);
+router.use('/', donationsRouter);
 router.use('/users', usersRouter);
+router.use('/', homeRouter);
 
 export default router;

@@ -5,8 +5,8 @@ import { donate, donatePage, listDonations } from './donations.middlewares.js';
 
 const router = express.Router();
 
-router.get('/', authenticate(), donatePage);
+router.get('/donate', authenticate(), donatePage);
+router.post('/donate', authenticate(), donate);
 router.get('/donations', listDonations);
-router.post('/', authenticate(), donate);
 
 export default router;

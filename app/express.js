@@ -27,8 +27,8 @@ export function route(func) {
     }
 
     const enrichedRes = Object.create(res);
-    res.redirect = redirectAfterSavingSession;
-    res.render = renderWithDefaultLocals;
+    enrichedRes.redirect = redirectAfterSavingSession;
+    enrichedRes.render = renderWithDefaultLocals;
 
     return Promise.resolve()
       .then(() => func(req, enrichedRes, next))
