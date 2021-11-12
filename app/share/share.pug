@@ -1,31 +1,31 @@
 extends ../page-layout
 
 block content
-  .row.mt-4
-    //- Share form
+  .row
     .col-12.col-lg-6
-      h3 Share your experience!
+      if shared
+        .alert.alert-success We appreciate your feedback.
+        a.btn.btn-primary(href=landingPageBaseUrl + "/") Close
+        a.btn.btn-secondary.ms-2(href='/share') Share more!
 
-      form.mt-3(action='/share', method='POST')
+      else
+        //- Share form
+        form(action='/share', method='POST')
+          //- Name field
+          .mb-3
+            label.form-label(for='comment-name') Your name
+            input#comment-name.form-control(
+              type='string',
+              name='name',
+              required,
+              minlength=1,
+              maxlength=50
+            )
 
-        //- Name field
-        .mb-3
-          label.form-label(for='share-name') Name
-          input#share-name.form-control(
-            type='string',
-            name='name',
-            required,
-            minlength=1,
-            maxlength=50
-          )
+          //- Comment field
+          .mb-3
+            label.form-label(for='comment-text') Why do you love The Revolutionary Product?
+            textarea#comment-text.form-control(name='text', rows=3)
 
-        //- Comment field
-        .mb-3
-          label.form-label(for='share-comment') Comment
-          textarea#share-comment.form-control(
-            name='comment',
-            rows=3
-          )
-
-        //- Actions
-        button.btn.btn-primary(type='submit') Share
+          //- Actions
+          button.btn.btn-primary(type='submit') Share

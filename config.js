@@ -14,7 +14,7 @@ export async function loadConfig() {
 
   const dbFile = resolvePath(
     root,
-    parseEnvString('REVPROD_DB_FILE', 'db.loki')
+    parseEnvString('REVPROD_DB_FILE', 'db.json')
   );
 
   const host = parseEnvString('REVPROD_LISTEN_HOST', '0.0.0.0');
