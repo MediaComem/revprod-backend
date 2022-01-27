@@ -62,7 +62,7 @@ The application can be configured using the following environment variables:
 | `REVPROD_LOG_LEVEL`             | `DEBUG` in production, `TRACE` otherwise | The highest level of log messages to output.                      |
 
 > In development mode, you can also put these settings in a `.env` file in the
-> repository.
+> repository. See the `.env.sample` file.
 
 [cors]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 [node]: https://nodejs.org
