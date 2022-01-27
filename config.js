@@ -39,9 +39,9 @@ export async function loadConfig() {
   );
 
   function createLogger(category) {
-    const logger = log4js.getLogger(category);
-    logger.level = logLevel;
-    return logger;
+    const newLogger = log4js.getLogger(category);
+    newLogger.level = logLevel;
+    return newLogger;
   }
 
   const logger = createLogger('config');
