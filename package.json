@@ -36,13 +36,13 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@prettier/plugin-pug": "^2.3.0",
+    "@prettier/plugin-pug": "^3.0.0",
     "del-cli": "^5.0.0",
     "dotenv": "^16.0.3",
-    "nodemon": "^2.0.14",
-    "prettier": "^2.4.1"
+    "nodemon": "^3.0.1",
+    "prettier": "^3.0.3"
   },
   "engines": {
-    "node": ">= 18.0.0"
+    "node": "^20.0.0"
   }
 }
