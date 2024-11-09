@@ -1,6 +1,6 @@
 {
   "name": "revprod-backend",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Backend of the website for The Revolutionary Product",
   "private": true,
   "repository": {
@@ -43,6 +43,6 @@
     "prettier": "^3.3.3"
   },
   "engines": {
-    "node": ">= 22.0.0"
+    "node": "^22.0.0"
   }
 }

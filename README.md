@@ -16,7 +16,7 @@ and [reverse proxying](https://en.wikipedia.org/wiki/Reverse_proxy).
 
 ## Requirements
 
-- [Node.js][node] 16.x
+- [Node.js][node] 20.x
 
 ## Development
 
