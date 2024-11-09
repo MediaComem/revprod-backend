@@ -1,4 +1,4 @@
-import { createComment } from '../../db.js';
+import { createComment, getComments } from '../../db.js';
 import { route } from '../express.js';
 import { getValidationErrors } from '../validation.js';
 
@@ -14,22 +14,26 @@ export const share = route(async (req, res) => {
     return res.redirect('/');
   }
 
-  const { name, text } = data;
+  const { name, text } = req.body;
 
   await createComment({ name, text });
 
-  req.get('logger').info(`New comment by ${JSON.stringify(name)}`);
+  req.logger.info(`New comment by ${JSON.stringify(name)}`);
 
-  res.redirect('/');
+  res.render('share/share', {
+    pageTitle: 'Thank you!',
+    shared: true
+  });
 });
 
 export const listComments = route(async (req, res) => {
-  const comments = req.app
-    .get('db')
-    .sort((a, b) => b.date.valueOf() - a.date.valueOf())
-    .map(commentToJson);
+  const comments = await getComments();
 
-  res.send(comments);
+  res.send(
+    comments
+      .sort((a, b) => b.date.valueOf() - a.date.valueOf())
+      .map(commentToJson)
+  );
 });
 
 function commentToJson({ name, text, date }) {

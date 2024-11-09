@@ -30,19 +30,18 @@ export function createApplication(config, db) {
   // Serve static files from the public directory.
   app.use(express.static(joinPath(root, 'public')));
 
-  // Provide common local variables to all views.
-  app.use(provideDefaultLocals(config));
-
   // Allow cross origin requests (if enabled).
   if (config.cors) {
-    app.use(
-      cors({
-        origin: config.corsOrigins.length
-          ? config.corsOrigins.length
-          : undefined
-      })
-    );
+    const corsOptions = {};
+    if (config.corsOrigins.length) {
+      corsOptions.origin = config.corsOrigins;
+    }
+
+    app.use(cors(corsOptions));
   }
+
+  // Provide common local variables to all views.
+  app.use(provideDefaultLocals(config));
 
   // Plug in application routes.
   app.use('/', router);

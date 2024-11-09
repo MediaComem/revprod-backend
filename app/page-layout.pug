@@ -11,27 +11,24 @@ block page
 
       ul.navbar-nav.ms-auto.mb-2.mb-lg-0
         li.nav-item
-          a.nav-link(href=landingPageBaseUrl) Home
+          a.nav-link(href=landingPageBaseUrl + "/") Home
         li.nav-item
           a.nav-link.active(href='/share') Share
 
-  //- Welcome message
-  .container
+  .container.pb-3
+    //- Page title
     if pageTitle
       h2.mb-3= pageTitle
 
-    //- Flash messages
-    if flash
-      if flash.warning
-        each warning in flash.warning
-          .alert.alert-warning.mt-3
-            i.bi.bi-exclamation-triangle-fill.me-2
-            = flash.warning
-      if flash.info
-        each info in flash.info
-          .alert.alert-success.d-flex.align-items-center.mt-3
-            i.bi.bi-check-circle-fill.me-2
-            = flash.info
-
     //- Page content
     block content
+
+  //- Footer
+  footer.fixed-bottom.py-5.bg-dark
+    .container.px-5
+      .m0.text-center.text-white
+        | Copyright &copy;
+        = ' '
+        = title
+        = ' '
+        | 2021-2022

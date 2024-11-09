@@ -1,36 +1,55 @@
 import { readFile, writeFile } from 'fs/promises';
-import { omit } from 'lodash-es';
 import { DateTime } from 'luxon';
 
+const maxComments = 5;
+
+let db;
+let dbFile;
+
 export async function openDatabase(config) {
+  if (db) {
+    throw new Error('Database is already open');
+  }
+
   try {
     const dbContents = await readFile(config.dbFile, 'utf8');
     const { comments } = JSON.parse(dbContents);
-    return {
-      comments: comments.map(deserializeComment),
-      config
-    };
+    dbFile = config.dbFile;
+    db = { comments };
   } catch (err) {
     if (err.code === 'ENOENT') {
-      return createBlankDatabase();
+      dbFile = config.dbFile;
+      db = createBlankDatabase();
+      return;
     }
 
     throw err;
   }
 }
 
-export async function createComment(db, { name, text }) {
+function createBlankDatabase(config) {
+  return {
+    comments: []
+  };
+}
+
+export async function createComment({ name, text }) {
+  ensureDatabase();
+
   const comment = { name, text, date: DateTime.now() };
   db.comments.push(serializeComment(comment));
-  await saveDatabase(db);
+  if (db.comments.length > maxComments) {
+    db.comments.splice(0, db.comments.length - maxComments);
+  }
+
+  await saveDatabase();
+
   return comment;
 }
 
-function createBlankDatabase(config) {
-  return {
-    config,
-    comments: []
-  };
+export async function getComments() {
+  ensureDatabase();
+  return Promise.resolve(db.comments.map(deserializeComment));
 }
 
 function deserializeComment({ date, ...rest }) {
@@ -47,6 +66,15 @@ function serializeComment({ date, ...rest }) {
   };
 }
 
-async function saveDatabase(db) {
-  await writeFile(db.config.dbFile, JSON.stringify(omit(db, 'config')), 'utf8');
+function ensureDatabase() {
+  if (!dbFile) {
+    throw new Error('Database file is not set');
+  } else if (!db) {
+    throw new Error('Database file has not been loaded');
+  }
+}
+
+async function saveDatabase() {
+  ensureDatabase();
+  await writeFile(dbFile, JSON.stringify(db), 'utf8');
 }

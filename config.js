@@ -14,7 +14,7 @@ export async function loadConfig() {
 
   const dbFile = resolvePath(
     root,
-    parseEnvString('REVPROD_DB_FILE', 'db.loki')
+    parseEnvString('REVPROD_DB_FILE', 'db.json')
   );
 
   const host = parseEnvString('REVPROD_LISTEN_HOST', '0.0.0.0');
@@ -39,9 +39,9 @@ export async function loadConfig() {
   );
 
   function createLogger(category) {
-    const logger = log4js.getLogger(category);
-    logger.level = logLevel;
-    return logger;
+    const newLogger = log4js.getLogger(category);
+    newLogger.level = logLevel;
+    return newLogger;
   }
 
   const logger = createLogger('config');

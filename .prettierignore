@@ -1,3 +1,4 @@
 # https://prettier.io/docs/en/ignore.html
+/db.json
 /node_modules
 /sessions

@@ -1,5 +1,5 @@
 {
-  "name": "comem-archidep-revprod-backend",
+  "name": "revprod-backend",
   "version": "1.1.0",
   "description": "Backend of the website for The Revolutionary Product",
   "private": true,
