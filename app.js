@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import cors from 'cors';
 import express from 'express';
 import createError from 'http-errors';

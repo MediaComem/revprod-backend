@@ -7,7 +7,6 @@ block content
       h3 Share your experience!
 
       form.mt-3(action='/share', method='POST')
-
         //- Name field
         .mb-3
           label.form-label(for='share-name') Name
@@ -22,10 +21,7 @@ block content
         //- Comment field
         .mb-3
           label.form-label(for='share-comment') Comment
-          textarea#share-comment.form-control(
-            name='comment',
-            rows=3
-          )
+          textarea#share-comment.form-control(name='comment', rows=3)
 
         //- Actions
         button.btn.btn-primary(type='submit') Share

@@ -2,18 +2,18 @@ extends layout
 
 block page
   //- Navbar
-  nav.navbar.navbar-expand-lg.navbar-dark.bg-danger.mb-5
+  nav.navbar.navbar-expand-lg.navbar-dark.bg-primary.mb-5
     .container.px-5
-      a.navbar-brand(href=landingPageBaseUrl + '/')
-        i.bi.bi-piggy-bank.me-2
-        = ' '
+      a.navbar-brand(href=landingPageBaseUrl + "/")
+        i.bi.bi-diamond-half.me-2
+        = " "
         = title
 
       ul.navbar-nav.ms-auto.mb-2.mb-lg-0
         li.nav-item
-          a.nav-link(href="/") Home
+          a.nav-link(href=landingPageBaseUrl) Home
         li.nav-item
-          a.nav-link.active(href="/share") Share
+          a.nav-link.active(href='/share') Share
 
   //- Welcome message
   .container
