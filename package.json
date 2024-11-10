@@ -15,10 +15,14 @@
   "homepage": "https://github.com/MediaComem/revprod-backend#readme",
   "type": "module",
   "scripts": {
+    "check": "npm run lint && npm run format",
+    "check:write": "npm run lint:write && npm run format:write",
     "clean": "del db.json",
     "dev": "nodemon",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
+    "lint": "eslint --max-warnings 0",
+    "lint:write": "eslint --max-warnings 0",
     "start": "node ./bin.js"
   },
   "dependencies": {
@@ -36,9 +40,17 @@
     "uuid": "^11.0.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.14.0",
     "@prettier/plugin-pug": "^3.2.0",
     "del-cli": "^6.0.0",
     "dotenv": "^16.4.5",
+    "eslint": "^9.14.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-promise": "^7.1.0",
+    "eslint-plugin-sonarjs": "^2.0.4",
+    "eslint-plugin-unicorn": "^56.0.0",
+    "globals": "^15.12.0",
     "nodemon": "^3.1.7",
     "prettier": "^3.3.3"
   },

@@ -1,4 +1,4 @@
-import { createServer as createHttpServer } from 'http';
+import { createServer as createHttpServer } from 'node:http';
 
 export function startServer(config, app) {
   const logger = config.createLogger('www');
@@ -7,28 +7,32 @@ export function startServer(config, app) {
 
   return new Promise((resolve, reject) => {
     server.listen(config.port, config.host);
-    server.on('error', onError);
-    server.on('listening', onListening);
+    server.on('error', onServerError);
+    server.on('listening', onServerListening);
 
-    function onError(err) {
+    function onServerError(err) {
       if (err.syscall !== 'listen') {
-        return reject(err);
+        reject(err);
+        return;
       }
 
       // Handle specific listen errors with friendly messages.
       switch (err.code) {
-        case 'EACCES':
+        case 'EACCES': {
           reject(new Error(`Port ${config.port} requires elevated privileges`));
           break;
-        case 'EADDRINUSE':
+        }
+        case 'EADDRINUSE': {
           reject(new Error(`Port ${config.port} is already in use`));
           break;
-        default:
+        }
+        default: {
           reject(err);
+        }
       }
     }
 
-    function onListening() {
+    function onServerListening() {
       logger.info(`Listening on ${config.host}:${config.port}`);
       resolve();
     }

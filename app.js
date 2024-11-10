@@ -2,10 +2,10 @@ import cors from 'cors';
 import express from 'express';
 import createError from 'http-errors';
 import log4js from 'log4js';
-import { join as joinPath } from 'path';
+import { join as joinPath } from 'node:path';
 
-import { root } from './config.js';
 import router from './app/routes.js';
+import { root } from './config.js';
 
 export function createApplication(config, db) {
   const app = express();
@@ -33,10 +33,11 @@ export function createApplication(config, db) {
   // Allow cross origin requests (if enabled).
   if (config.cors) {
     const corsOptions = {};
-    if (config.corsOrigins.length) {
+    if (config.corsOrigins.length !== 0) {
       corsOptions.origin = config.corsOrigins;
     }
 
+    // eslint-disable-next-line sonarjs/cors
     app.use(cors(corsOptions));
   }
 
@@ -52,7 +53,13 @@ export function createApplication(config, db) {
   });
 
   // Global error handler
-  app.use((err, req, res, next) => {
+  app.use(createGlobalErrorHandler(config, logger));
+
+  return app;
+}
+
+function createGlobalErrorHandler(config, logger) {
+  return (err, req, res, _next) => {
     logger.warn(err);
 
     // Set locals, only providing error in development.
@@ -63,9 +70,7 @@ export function createApplication(config, db) {
     // Render the error page.
     res.status(err.status || 500);
     res.render('error');
-  });
-
-  return app;
+  };
 }
 
 function provideDefaultLocals(config) {

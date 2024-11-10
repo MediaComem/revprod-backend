@@ -1,25 +1,28 @@
-import { readFile, writeFile } from 'fs/promises';
 import { DateTime } from 'luxon';
+import { readFile, writeFile } from 'node:fs/promises';
 
 const maxComments = 5;
 
-let db;
-let dbFile;
+let dbPromise = Promise.reject(new Error('Database is not open'));
+let dbOpen = false;
 
-export async function openDatabase(config) {
-  if (db) {
+export async function openDatabase({ dbFile }) {
+  if (dbOpen) {
     throw new Error('Database is already open');
   }
 
+  dbOpen = true;
+
   try {
-    const dbContents = await readFile(config.dbFile, 'utf8');
-    const { comments } = JSON.parse(dbContents);
-    dbFile = config.dbFile;
-    db = { comments };
+    const dbContents = await readFile(dbFile, 'utf8');
+    const dbData = JSON.parse(dbContents);
+    dbPromise = Promise.resolve({ file: dbFile, data: dbData });
   } catch (err) {
     if (err.code === 'ENOENT') {
-      dbFile = config.dbFile;
-      db = createBlankDatabase();
+      dbPromise = Promise.resolve({
+        file: dbFile,
+        data: createBlankDatabase()
+      });
       return;
     }
 
@@ -27,19 +30,19 @@ export async function openDatabase(config) {
   }
 }
 
-function createBlankDatabase(config) {
+function createBlankDatabase() {
   return {
     comments: []
   };
 }
 
 export async function createComment({ name, text }) {
-  ensureDatabase();
+  const db = await dbPromise;
 
   const comment = { name, text, date: DateTime.now() };
-  db.comments.push(serializeComment(comment));
-  if (db.comments.length > maxComments) {
-    db.comments.splice(0, db.comments.length - maxComments);
+  db.data.comments.push(serializeComment(comment));
+  if (db.data.comments.length > maxComments) {
+    db.data.comments.splice(0, db.data.comments.length - maxComments);
   }
 
   await saveDatabase();
@@ -48,8 +51,8 @@ export async function createComment({ name, text }) {
 }
 
 export async function getComments() {
-  ensureDatabase();
-  return Promise.resolve(db.comments.map(deserializeComment));
+  const db = await dbPromise;
+  return db.data.comments.map(comment => deserializeComment(comment));
 }
 
 function deserializeComment({ date, ...rest }) {
@@ -66,15 +69,7 @@ function serializeComment({ date, ...rest }) {
   };
 }
 
-function ensureDatabase() {
-  if (!dbFile) {
-    throw new Error('Database file is not set');
-  } else if (!db) {
-    throw new Error('Database file has not been loaded');
-  }
-}
-
 async function saveDatabase() {
-  ensureDatabase();
-  await writeFile(dbFile, JSON.stringify(db), 'utf8');
+  const db = await dbPromise;
+  await writeFile(db.file, JSON.stringify(db.data), 'utf8');
 }

@@ -25,6 +25,10 @@ jobs:
         run: |
           npm ci
 
+      - name: Analyze the code
+        run: |
+          npm run lint
+
       - name: Check source code formatting
         run: |
           npm run format

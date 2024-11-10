@@ -1,8 +1,8 @@
 import Ajv from 'ajv';
 import ajvErrors from 'ajv-errors';
 import glob from 'fast-glob';
-import { readFile } from 'fs/promises';
-import { basename, join as joinPath } from 'path';
+import { readFile } from 'node:fs/promises';
+import { basename, join as joinPath } from 'node:path';
 
 import { root } from '../config.js';
 
@@ -14,11 +14,15 @@ ajvErrors(ajv);
 
 export async function loadSchemas(config) {
   const logger = config.createLogger('validation');
-  for (const file of await findSchemas(logger)) {
-    const { name, schema } = await loadSchema(file);
-    ajv.addSchema(schema, name);
-    logger.trace(`Loaded "${name}" JSON schema from ${file}`);
-  }
+
+  const files = await findSchemas(logger);
+  await Promise.all(
+    files.map(async file => {
+      const { name, schema } = await loadSchema(file);
+      ajv.addSchema(schema, name);
+      logger.trace(`Loaded "${name}" JSON schema from ${file}`);
+    })
+  );
 }
 
 export function getValidationErrors(data, schemaName) {
@@ -26,6 +30,8 @@ export function getValidationErrors(data, schemaName) {
   if (!validate(data)) {
     return validate.errors;
   }
+
+  return undefined;
 }
 
 async function findSchemas(logger) {
@@ -50,7 +56,7 @@ function getSchema(name) {
 }
 
 async function loadSchema(file) {
-  const schemaName = basename(file).replace(/\..*$/, '');
+  const schemaName = basename(file).replace(/\.schema\.json$/u, '');
   if (ajv.getSchema(schemaName)) {
     throw new Error(
       `JSON schema ${schemaName} (from file ${file}) has already been defined`

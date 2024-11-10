@@ -1,39 +1,45 @@
 import { identity, isInteger } from 'lodash-es';
 import log4js from 'log4js';
-import { dirname, resolve as resolvePath } from 'path';
-import { fileURLToPath } from 'url';
+import { dirname, resolve as resolvePath } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const logLevels = ['FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE'];
 
 export const root = dirname(fileURLToPath(import.meta.url));
 
+// eslint-disable-next-line max-lines-per-function
 export async function loadConfig() {
   await loadDotenv();
 
-  const env = process.env.NODE_ENV ?? 'development';
+  const environment = process.env.NODE_ENV ?? 'development';
 
   const dbFile = resolvePath(
     root,
-    parseEnvString('REVPROD_DB_FILE', 'db.json')
+    parseEnvironmentString('REVPROD_DB_FILE', 'db.json')
   );
 
-  const host = parseEnvString('REVPROD_LISTEN_HOST', '0.0.0.0');
-  const port = parseEnvPort('REVPROD_LISTEN_PORT', 3000);
+  const host = parseEnvironmentString('REVPROD_LISTEN_HOST', '0.0.0.0');
+  const port = parseEnvironmentPort('REVPROD_LISTEN_PORT', 3000);
 
-  const logLevel = parseEnvEnum(
+  const logLevel = parseEnvironmentEnum(
     'REVPROD_LOG_LEVEL',
     logLevels,
-    env === 'production' ? 'DEBUG' : 'TRACE',
+    environment === 'production' ? 'DEBUG' : 'TRACE',
     value => value.toUpperCase()
   );
 
-  const cors = parseEnvBoolean('REVPROD_CORS', false);
-  const corsOrigins = parseEnvString('REVPROD_CORS_ORIGINS', [], origins =>
-    origins.split(',')
+  const cors = parseEnvironmentBoolean('REVPROD_CORS', false);
+  const corsOrigins = parseEnvironmentString(
+    'REVPROD_CORS_ORIGINS',
+    [],
+    origins => origins.split(',')
   );
 
-  const title = parseEnvString('REVPROD_TITLE', 'The Revolutionary Product');
-  const landingPageBaseUrl = parseEnvString(
+  const title = parseEnvironmentString(
+    'REVPROD_TITLE',
+    'The Revolutionary Product'
+  );
+  const landingPageBaseUrl = parseEnvironmentString(
     'REVPROD_LANDING_PAGE_BASE_URL',
     ''
   );
@@ -45,12 +51,12 @@ export async function loadConfig() {
   }
 
   const logger = createLogger('config');
-  logger.info(`Environment: ${env}`);
+  logger.info(`Environment: ${environment}`);
   logger.info(`Log level: ${logLevel}`);
   logger.info(`CORS enabled: ${cors}`);
   logger.info(
     `CORS allowed origins: ${
-      corsOrigins.length ? corsOrigins.join(', ') : 'all'
+      corsOrigins.length === 0 ? 'all' : corsOrigins.join(', ')
     }`
   );
 
@@ -58,7 +64,7 @@ export async function loadConfig() {
     // Paths
     dbFile,
     // Environment,
-    env,
+    env: environment,
     // Server
     host,
     port,
@@ -77,7 +83,7 @@ async function loadDotenv() {
   let dotenv;
   try {
     dotenv = await import('dotenv');
-  } catch (err) {
+  } catch {
     // Ignore
   }
 
@@ -86,32 +92,37 @@ async function loadDotenv() {
   }
 }
 
-function getEnvString(varName, required = true) {
-  const value = process.env[varName];
+function getEnvironmentString(variableName, required = true) {
+  const value = process.env[variableName];
   if (required && value === undefined) {
-    throw new Error(`$${varName} is required`);
+    throw new Error(`$${variableName} is required`);
   }
 
   return value;
 }
 
-function parseEnvBoolean(varName, defaultValue) {
-  const value = getEnvString(varName, defaultValue === undefined);
+function parseEnvironmentBoolean(variableName, defaultValue) {
+  const value = getEnvironmentString(variableName, defaultValue === undefined);
   if (value === undefined) {
     return defaultValue;
-  } else if (value.match(/^(?:1|y|yes|t|true)$/u)) {
+  } else if (/^(?:1|y|yes|t|true)$/u.text(value)) {
     return true;
-  } else if (value.match(/^(?:0|n|no|f|false)$/u)) {
+  } else if (/^(?:0|n|no|f|false)$/u.test(value)) {
     return false;
-  } else {
-    throw new Error(
-      `$${varName} must be a boolean, but its value is ${JSON.stringify(value)}`
-    );
   }
+
+  throw new Error(
+    `$${variableName} must be a boolean, but its value is ${JSON.stringify(value)}`
+  );
 }
 
-function parseEnvEnum(varName, allowedValues, defaultValue, coerce = identity) {
-  const value = getEnvString(varName, defaultValue === undefined);
+function parseEnvironmentEnum(
+  variableName,
+  allowedValues,
+  defaultValue,
+  coerce = identity
+) {
+  const value = getEnvironmentString(variableName, defaultValue === undefined);
   if (value === undefined) {
     return defaultValue;
   }
@@ -119,7 +130,7 @@ function parseEnvEnum(varName, allowedValues, defaultValue, coerce = identity) {
   const coerced = coerce(value);
   if (!allowedValues.includes(coerced)) {
     throw new Error(
-      `$${varName} must be one of ${allowedValues
+      `$${variableName} must be one of ${allowedValues
         .map(allowed => JSON.stringify(allowed))
         .join(', ')}, but its value is ${JSON.stringify(coerced)}`
     );
@@ -128,20 +139,20 @@ function parseEnvEnum(varName, allowedValues, defaultValue, coerce = identity) {
   return coerced;
 }
 
-function parseEnvInt(varName, defaultValue, min, max) {
-  const value = getEnvString(varName, defaultValue === undefined);
+function parseEnvironmentInt(variableName, defaultValue, min, max) {
+  const value = getEnvironmentString(variableName, defaultValue === undefined);
   if (value === undefined) {
     return defaultValue;
   }
 
-  const parsed = parseInt(value, 10);
+  const parsed = Number.parseInt(value, 10);
   if (
     !isInteger(parsed) ||
     (min !== undefined && value < min) ||
     (max !== undefined && value > max)
   ) {
     throw new Error(
-      `$${varName} must be an integer between ${min ?? '-Infinity'} and ${
+      `$${variableName} must be an integer between ${min ?? '-Infinity'} and ${
         max ?? 'Infinity'
       }, but its value is ${JSON.stringify(value)}`
     );
@@ -150,12 +161,12 @@ function parseEnvInt(varName, defaultValue, min, max) {
   return parsed;
 }
 
-function parseEnvPort(varName, defaultValue) {
-  return parseEnvInt(varName, defaultValue, 1, 65_535);
+function parseEnvironmentPort(variableName, defaultValue) {
+  return parseEnvironmentInt(variableName, defaultValue, 1, 65_535);
 }
 
-function parseEnvString(varName, defaultValue, coerce = identity) {
-  const value = getEnvString(varName, defaultValue === undefined);
+function parseEnvironmentString(variableName, defaultValue, coerce = identity) {
+  const value = getEnvironmentString(variableName, defaultValue === undefined);
   if (value === undefined) {
     return defaultValue;
   }
