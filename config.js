@@ -105,14 +105,16 @@ function parseEnvironmentBoolean(variableName, defaultValue) {
   const value = getEnvironmentString(variableName, defaultValue === undefined);
   if (value === undefined) {
     return defaultValue;
-  } else if (/^(?:1|y|yes|t|true)$/u.text(value)) {
+  } else if (/^(?:1|y|yes|t|true)$/u.test(value)) {
     return true;
   } else if (/^(?:0|n|no|f|false)$/u.test(value)) {
     return false;
   }
 
   throw new Error(
-    `$${variableName} must be a boolean, but its value is ${JSON.stringify(value)}`
+    `$${variableName} must be a boolean, but its value is ${JSON.stringify(
+      value
+    )}`
   );
 }
 
