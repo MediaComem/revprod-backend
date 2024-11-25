@@ -3,7 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 
 const maxComments = 5;
 
-let dbPromise = Promise.reject(new Error('Database is not open'));
+let dbPromise;
 let dbOpen = false;
 
 export async function openDatabase({ dbFile }) {
